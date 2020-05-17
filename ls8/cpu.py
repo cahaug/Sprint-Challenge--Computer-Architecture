@@ -3,21 +3,16 @@
 import sys
 
 # OP CODES
-HLT = 0b00000001  # Halt function, if HLT is encountered running = False
-LDI = 0b10000010  # SAVE function
-PRN = 0b01000111  # PRINT function
-MUL = 0b10100010  # MULTIPLY function
+HLT = 0b00000001   # Halt function, if HLT is encountered running = False
+LDI = 0b10000010   # SAVE function
+PRN = 0b01000111   # PRINT function
+MUL = 0b10100010   # MULTIPLY function
 PUSH = 0b01000101  # PUSH function -- add the value from the given register to the stack
-# POP function -- pop the value from the top of the stack to the given register
-POP = 0b01000110
+POP = 0b01000110   # POP function -- pop the value from the top of the stack to the given register
 CALL = 0b01010000  # CALL function
-RET = 0b00010001  # RET function
-ADD = 0b10100000  # ADD function
-ST = 0b10000100  # ST function
-JMP = 0b01010100  # JMP - jump to address stored in given register
-IRET = 0b00010011  # IRET - interrupt return
-PRA = 0b01001000  # PRA - print alpha
-
+RET = 0b00010001   # RET function
+ADD = 0b10100000   # ADD function
+CMP = 0b10100111   # CMP - compare, ALU function, compares two values and set appropriate Equals flag
 
 class CPU:
     """Main CPU class."""
@@ -40,6 +35,7 @@ class CPU:
         self.branchtable[CALL] = self.handle_call
         self.branchtable[RET] = self.handle_ret
         self.branchtable[ADD] = self.handle_add
+        self.branchtable[CMP] = self.handle_cmp
         
     def load(self):
         """Load a program into memory."""
@@ -163,6 +159,9 @@ class CPU:
         self.reg[self.SP] += 1
         # send the value to the program counter
         self.pc = return_value
+
+    def handle_cmp(self):
+        pass
 
 
     def run(self):
