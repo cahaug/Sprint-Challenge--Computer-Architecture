@@ -26,6 +26,7 @@ class CPU:
         self.reg = [0] * 8
         self.pc = 0
         self.SP = 7
+        self.E = None # our equals flag
         self.reg[self.SP] = len(self.ram) - 12 #initiate stack at F4 per readme
         self.running = False
         self.branchtable = {}
@@ -174,15 +175,33 @@ class CPU:
         self.pc += 3
 
     def handle_jmp(self):
+        # get our input
         register_location = self.ram[self.pc + 1]
+        # set the PC to the address stored in the given register
         jump_to = self.reg[register_location]
         self.pc = jump_to
 
     def handle_jeq(self):
-        pass
+        if self.E == True: # if true, jump to address given
+            # get our input
+            register_location = self.ram[self.pc + 1]
+            # set the PC to the address stored in the given register
+            jump_to = self.reg[register_location]
+            self.pc = jump_to
+        else:
+            # advance to the next instruction
+            self.pc += 2
 
     def handle_jne(self):
-        pass
+        if self.E == False: # if true, jump to address given
+            # get our input
+            register_location = self.ram[self.pc + 1]
+            # set the PC to the address stored in the given register
+            jump_to = self.reg[register_location]
+            self.pc = jump_to
+        else:
+            # advance to the next instruction
+            self.pc += 2
 
 
     def run(self):
