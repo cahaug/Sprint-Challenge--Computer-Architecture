@@ -13,7 +13,8 @@ CALL = 0b01010000  # CALL function
 RET = 0b00010001   # RET function
 ADD = 0b10100000   # ADD function
 CMP = 0b10100111   # CMP - compare, ALU function, compares two values and set appropriate Equals flag
-JEQ = 0b01010101   # JMP - Jump equal - IF E Flag is TRUE, jump to address stored in given register
+JMP = 0b01010100   # JMP - Jump - jump to address stored in given register
+JEQ = 0b01010101   # JEQ - Jump equal - IF E Flag is TRUE, jump to address stored in given register
 JNE = 0b01010110   # JNE - Jump Not Equal - IF E flag is FALSE jump to address stored in given register
 
 class CPU:
@@ -38,6 +39,7 @@ class CPU:
         self.branchtable[RET] = self.handle_ret
         self.branchtable[ADD] = self.handle_add
         self.branchtable[CMP] = self.handle_cmp
+        self.branchtable[JMP] = self.handle_jmp
         self.branchtable[JEQ] = self.handle_jeq
         self.branchtable[JNE] = self.handle_jne
         
@@ -66,7 +68,8 @@ class CPU:
             self.reg[reg_a] += self.reg[reg_b]
         elif op == 'MUL':
             self.reg[reg_a] *= self.reg[reg_b]
-        # elif op == "SUB": etc
+        elif op =='CMP':
+            self.E = (self.reg[reg_a] == self.reg[reg_b])
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -165,7 +168,15 @@ class CPU:
         self.pc = return_value
 
     def handle_cmp(self):
-        pass
+        # Send values to ALU with CMP instruction
+        self.alu('CMP', self.ram[self.pc + 1], self.ram[self.pc + 2])
+        # advance to the next instruction
+        self.pc += 3
+
+    def handle_jmp(self):
+        register_location = self.ram[self.pc + 1]
+        jump_to = self.reg[register_location]
+        self.pc = jump_to
 
     def handle_jeq(self):
         pass
