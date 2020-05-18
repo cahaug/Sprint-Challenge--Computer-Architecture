@@ -16,6 +16,13 @@ CMP = 0b10100111   # CMP - compare, ALU function, compares two values and set ap
 JMP = 0b01010100   # JMP - Jump - jump to address stored in given register
 JEQ = 0b01010101   # JEQ - Jump equal - IF E Flag is TRUE, jump to address stored in given register
 JNE = 0b01010110   # JNE - Jump Not Equal - IF E flag is FALSE jump to address stored in given register
+AND = 0b10101000   # AND -Perform a Bitwise-AND the values in registerA and registerB, then store the result in registerA.
+OR = 0b10101010    # OR - Perform a bitwise-OR between the values in registerA and registerB, storing the result in registerA.
+XOR = 0b10101011   # XOR - Perform a bitwise-XOR between the values in registerA and registerB, storing the result in registerA.
+NOT = 0b01101001   # NOT - Perform a bitwise-NOT on the value in a register, storing the result in the register.
+SHL = 0b10101100   # SHL - Shift the value in registerA left by the number of bits specified in registerB, filling the low bits with 0.
+SHR = 0b10101101   # SHR - Shift the value in registerA right by the number of bits specified in registerB, filling the high bits with 0.
+MOD = 0b10100100   # MOD - Divide the value in the first register by the value in the second, storing the remainder of the result in registerA.
 
 class CPU:
     """Main CPU class."""
@@ -43,6 +50,13 @@ class CPU:
         self.branchtable[JMP] = self.handle_jmp
         self.branchtable[JEQ] = self.handle_jeq
         self.branchtable[JNE] = self.handle_jne
+        self.branchtable[AND] = self.handle_and
+        self.branchtable[OR] = self.handle_or
+        self.branchtable[XOR] = self.handle_xor
+        self.branchtable[NOT] = self.handle_not
+        self.branchtable[SHL] = self.handle_shl
+        self.branchtable[SHR] = self.handle_shr
+        self.branchtable[MOD] = self.handle_mod
         
     def load(self):
         """Load a program into memory."""
@@ -71,6 +85,20 @@ class CPU:
             self.reg[reg_a] *= self.reg[reg_b]
         elif op =='CMP':
             self.E = (self.reg[reg_a] == self.reg[reg_b])
+        elif op == 'AND':
+            self.reg[reg_a] = self.reg[reg_a] & self.reg[reg_b]
+        elif op == 'OR':
+            self.reg[reg_a] = self.reg[reg_a] | self.reg[reg_b]
+        elif op == 'XOR':
+            self.reg[reg_a] = self.reg[reg_a] ^ self.reg[reg_b]
+        elif op == 'NOT':
+            self.reg[reg_a] = ~self.reg[reg_a]
+        elif op == 'SHL':
+            self.reg[reg_a] = self.reg[reg_a] << self.reg[reg_b]
+        elif op == 'SHR':
+            self.reg[reg_a] = self.reg[reg_a] >> self.reg[reg_b]
+        elif op == 'MOD':
+            self.reg[reg_a] = self.reg[reg_a] % self.reg[reg_b]
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -202,6 +230,53 @@ class CPU:
         else:
             # advance to the next instruction
             self.pc += 2
+
+    def handle_and(self):
+        # Send values to ALU with AND instruction
+        self.alu('AND', self.ram[self.pc + 1], self.ram[self.pc + 2])
+        # advance to the next instruction
+        self.pc += 3
+
+    def handle_or(self):
+        # Send values to ALU with OR instruction
+        self.alu('OR', self.ram[self.pc + 1], self.ram[self.pc + 2])
+        # advance to the next instruction
+        self.pc += 3
+
+    def handle_xor(self):
+        # Send values to ALU with XOR instruction
+        self.alu('XOR', self.ram[self.pc + 1], self.ram[self.pc + 2])
+        # advance to the next instruction
+        self.pc += 3
+
+    def handle_not(self):
+        # Send values to ALU with NOT instruction
+        self.alu('NOT', self.ram[self.pc + 1], self.ram[self.pc + 2])
+        # advance to the next instruction
+        self.pc += 3
+    
+    def handle_shl(self):
+        # Send values to ALU with SHL instruction
+        self.alu('SHL', self.ram[self.pc + 1], self.ram[self.pc + 2])
+        # advance to the next instruction
+        self.pc += 3
+
+    def handle_shr(self):
+        # Send values to ALU with SHR instruction
+        self.alu('SHR', self.ram[self.pc + 1], self.ram[self.pc + 2])
+        # advance to the next instruction
+        self.pc += 3
+
+    def handle_mod(self):
+        # check for dividing by zero, cannot do this
+        if self.ram[self.pc + 2] == 0:
+            self.handle_halt()
+        else:
+            # if not dividing by zero, Send values to ALU with MOD instruction
+            self.alu('MOD', self.ram[self.pc + 1], self.ram[self.pc + 2])
+            # advance to the next instruction
+            self.pc += 3
+
 
 
     def run(self):
