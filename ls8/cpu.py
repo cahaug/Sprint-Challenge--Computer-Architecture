@@ -193,7 +193,7 @@ class CPU:
             self.pc += 2
 
     def handle_jne(self):
-        if self.E == False: # if true, jump to address given
+        if self.E == False: # if false, jump to address given
             # get our input
             register_location = self.ram[self.pc + 1]
             # set the PC to the address stored in the given register
